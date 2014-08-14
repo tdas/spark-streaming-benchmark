@@ -5,7 +5,7 @@ There are two parts to the benchmark code. They are as follows.
 1. **DataGenerator**: This generates data for the benchmarking. It takes as input the following.
    	- The port that it listens on for incoming connections.
    	- The text file for input. The '\n'-delimited lines in the file are considered input data records.
-   	- The byte rate it sends the data (serialized lines) to any client that connects to it.
+   	- The byte rate at which it sends the data (serialized lines) to any client that connects to it.
    
 2. **Benchmark** - This consumes the generated data and after every batch interval (say, 1 second), prints the number of records received in the batch interval. It takes as input the following.
 	- The number streams it will create. This is the number of parallel data generators it is going to connect to. Typically this is the number of workers on which the benchmark is being run on (or 1 if it is being run on a local machine).
@@ -20,12 +20,12 @@ Git clone the repository on to your local machine.
 
 On terminal 1, run the DataGenerator. This uses the file 100-bytes-lines.txt where each line is 100 byte long, thus creating records of 100 bytes.
 
-	> sbt/sbt "run-main DataGenerator 9999 100-bytes-lines.txt 1000000 10000000"
+	> sbt/sbt "run-main DataGenerator 9999 100-bytes-lines.txt 10000000"
 
 The output should be something like this.
 	
 	[info] Set current project to benchmark-app
-	[info] Running DataGenerator 9999 100-bytes-lines.txt 10000000 100000000
+	[info] Running DataGenerator 9999 100-bytes-lines.txt 100000000
 	Listening on port 9999
 
 	
@@ -53,4 +53,15 @@ The output should be something like this. Pay attention to the *Total delay*, it
 
 ## Running on a Cluster
 
-To run it a on a Spark cluster of *N* worker nodes (that is, machines on which Spark executors will be launched), you will have to start a DataGenerator on each of the worker nodes. Then launch the Benchmark with *N* as the number of streams, `localhost` as hostname, and `port` as the data generator's port. 
+To run it a on a Spark cluster of *N* worker nodes (that is, machines on which Spark executors will be launched), 
+you will have to start a DataGenerator on each of the worker nodes. Then launch the Benchmark with *N* as the number of streams, `localhost` as hostname, and `port` as the data generator's port. 
+
+## Generating Input Data for DataGenerator
+
+To generate text files of the required line/record size with space separating words, you can run the following lines in a Spark-shell.
+
+	// For a ~100 character line, we can generate 15 space-separated words of 6 characters each
+	val text = (1 to 100).map(x => { (1 to 15).map(_ => scala.util.Random.alphanumeric.take(6).mkString("")).mkString(" ") }).mkString("\n")
+	org.apache.commons.io.FileUtils.writeStringToFile(new java.io.File("100-bytes-lines.txt"), text)
+ 
+

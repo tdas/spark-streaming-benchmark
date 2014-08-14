@@ -16,7 +16,7 @@ There are two parts to the benchmark code. They are as follows.
 
 Git clone the repository on to your local machine.
 
-	git clone 
+	git clone git@github.com:tdas/spark-streaming-benchmark.git
 
 On terminal 1, run the DataGenerator. This uses the file 100-bytes-lines.txt where each line is 100 byte long, thus creating records of 100 bytes.
 
@@ -31,7 +31,7 @@ The output should be something like this.
 	
 On terminal 2, run the Benchmark application.
 
-	> sbt/sbt "run-main Benchmark 1 localhost 9999 1000" 2>&1 | grep -i "jobscheduler\|record"
+	> sbt/sbt "run-main Benchmark 1 localhost 9999 1000" 2>&1 | grep -i "Total delay\|record"
 	
 The output should be something like this. Pay attention to the *Total delay*, it should stay stable. If it keeps increasing, then the system is not able to process the data as fast as it is being received, so its workload is unsustainable.
 
